@@ -1,0 +1,36 @@
+<input id="inp" onkeyup="result()"/>
+<br/><br/>
+<textarea id="result" style="width:200px; height:200px"></textarea>
+<script src="./wubi.js"></script>
+
+<script>
+var txt = document.getElementById("result"), inp = document.getElementById("inp")
+
+setTimeout(() => inp.focus(), 10)
+
+function result()
+{
+	switch(event.which)
+	{
+		case 27:	//ESC
+			inp.value = txt.value = ""
+			return
+			
+		case 13:	//ENTER
+			inp.value = ""
+			txt.focus()
+			txt.select()
+			return
+
+		case 8:		//BS
+			if(inp.value == "" && txt.value.length > 0) txt.value = txt.value.substr(0, txt.value.length - 1)
+			break
+	}
+	
+	var code = inp.value
+
+	var group = eval(code[0])
+	if(code != "" && group[code] != undefined) txt.value += group[code]
+	if(code.length == 4 || code.endsWith(" ")) inp.value = ""
+}
+</script>
