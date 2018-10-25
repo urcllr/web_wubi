@@ -1,15 +1,20 @@
-<input id="inp" onkeyup="result()" placeholder="在这里打入五笔编码"/>
+<input id="inp" onkeyup="result()" placeholder="五笔编码" style="width:80px; line-height:20px"/>
+<label id="tip" style="line-height:20px"></label>
 <br/><br/>
-<textarea id="result" style="width:200px; height:200px" placeholder="这里就会显示结果.可以连续打字哦"></textarea>
+<textarea id="result" style="width:300px; height:300px" placeholder="这里就会显示结果.可以连续打字哦"></textarea>
 <script src="./wubi.js"></script>
 
 <script>
-var txt = document.getElementById("result"), inp = document.getElementById("inp")
+var txt = document.getElementById("result"), inp = document.getElementById("inp"), tip = document.getElementById("tip")
+var delayBS = false
 
 setTimeout(() => inp.focus(), 10)
 
 function result()
 {
+	var code = inp.value
+	if(code != "") delayBS = true
+
 	switch(event.which)
 	{
 		case 27:	//ESC
@@ -23,14 +28,43 @@ function result()
 			return
 
 		case 8:		//BS
-			if(inp.value == "" && txt.value.length > 0) txt.value = txt.value.substr(0, txt.value.length - 1)
-			break
+			if(code == "")
+			{
+				if(delayBS)
+				{
+					delayBS = false
+					break
+				}
+				else if(txt.value != "")
+				{
+					txt.value = txt.value.substr(0, txt.value.length - 1)
+					break
+				}
+			}
+			
+		default:	//10 tips
+			tip.innerHTML = ""
+
+			if(code == "") return
+
+			if(inp.value.length == 4) break
+
+			var ct = 0, grp = eval(code[0])
+
+			var ch = grp[code.length < 4? `${code} ` : code]
+			if(ch != undefined) tip.innerHTML = ch
+
+			for(var cc = "a".charCodeAt(); cc < "z".charCodeAt(); cc++)
+			{
+				ch = grp[code + String.fromCharCode(cc) + (code.length == 3? "" : " ")]
+				if(ch != undefined && ct++ < 10) tip.innerHTML += `&nbsp;&nbsp;&nbsp;${String.fromCharCode(cc)}:${ch}`
+				if(ct == 5) break
+			}
 	}
 	
-	var code = inp.value
-
+	if(code == "") return
 	var group = eval(code[0])
-	if(code != "" && group[code] != undefined) txt.value += group[code]
+	if(group[code] != undefined) txt.value += group[code]
 	if(code.length == 4 || code.endsWith(" ")) inp.value = ""
 }
 </script>
