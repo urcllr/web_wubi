@@ -13,13 +13,14 @@ setTimeout(() => inp.focus(), 10)
 
 function input()
 {
+	//中英文本标点输入，以CTRL+SHIFT来切换。
 	if(event.ctrlKey && event.key == "Shift" || event.shiftKey && event.key == "Control")
 		mod.innerHTML = (mod.innerHTML == ",."? "，。" : ",.")
 
 	var code = inp.value
 	if(code != "")
 	{
-		//输入非五笔编码字符时,比如数字/标点就把它直接放到结果中.
+		//输入非五笔编码字符时，比如数字/标点就把它直接放到结果中。
 		var end = code[code.length - 1]
 		if((code == " " || end != " ") && (end.charCodeAt() < "a".charCodeAt() || end.charCodeAt() > "z".charCodeAt()))
 		{
