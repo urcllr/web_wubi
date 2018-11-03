@@ -1,7 +1,7 @@
 <input id="inp" onkeyup="result()" placeholder="五笔编码" style="width:80px; line-height:20px"/>
 <label id="tip" style="line-height:20px"></label>
 <br/><br/>
-<textarea id="result" style="width:300px; height:300px" placeholder="这里就会显示结果.可以连续打字哦"></textarea>
+<textarea id="result" style="width:300px; height:300px" placeholder="这里就会显示结果.可以连续打字哦" onkeyup="focus_return()"></textarea>
 <script src="./wubi.js"></script>
 
 <script>
@@ -66,5 +66,10 @@ function result()
 	var group = eval(code[0])
 	if(group[code] != undefined) txt.value += group[code]
 	if(code.length == 4 || code.endsWith(" ")) inp.value = ""
+}
+
+function focus_return()		//当结果框清空后就将焦点返回到输入框
+{
+	if(txt.value == "") inp.focus();
 }
 </script>
