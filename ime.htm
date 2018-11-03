@@ -1,30 +1,46 @@
-<input id="inp" onkeyup="result()" placeholder="五笔编码" style="width:80px; line-height:20px"/>
+<input id="inp" onkeyup="input()" placeholder="五笔编码" style="width:80px; line-height:20px"/>
+<label id="mod" style="line-height: 20px">,.</label>
 <label id="tip" style="line-height:20px"></label>
 <br/><br/>
 <textarea id="result" style="width:300px; height:300px" placeholder="这里就会显示结果.可以连续打字哦" onkeyup="focus_return()"></textarea>
 <script src="./wubi.js"></script>
 
 <script>
-var txt = document.getElementById("result"), inp = document.getElementById("inp"), tip = document.getElementById("tip")
+var result = document.getElementById("result"), inp = document.getElementById("inp"), mod = document.getElementById("mod"), tip = document.getElementById("tip")
 var delayBS = false
 
 setTimeout(() => inp.focus(), 10)
 
-function result()
+function input()
 {
+	if(event.ctrlKey && event.key == "Shift" || event.shiftKey && event.key == "Control")
+		mod.innerHTML = (mod.innerHTML == ",."? "，。" : ",.")
+
 	var code = inp.value
-	if(code != "") delayBS = true
+	if(code != "")
+	{
+		//输入非五笔编码字符时,比如数字/标点就把它直接放到结果中.
+		var end = code[code.length - 1]
+		if((code == " " || end != " ") && (end.charCodeAt() < "a".charCodeAt() || end.charCodeAt() > "z".charCodeAt()))
+		{
+			result.value += mod.innerHTML == ",."? end : end.replace(",", "，").replace(".", "。").replace(";", "；").replace(":", "：")
+			code = inp.value = code.substr(0, code.length - 1)
+		}
+
+		//退格键缓冲一次
+		if(code != "") delayBS = true
+	}
 
 	switch(event.which)
 	{
 		case 27:	//ESC
-			inp.value = txt.value = ""
+			inp.value = result.value = ""
 			return
 			
 		case 13:	//ENTER
 			inp.value = ""
-			txt.focus()
-			txt.select()
+			result.focus()
+			result.select()
 			return
 
 		case 8:		//BS
@@ -35,14 +51,14 @@ function result()
 					delayBS = false
 					break
 				}
-				else if(txt.value != "")
+				else if(result.value != "")
 				{
-					txt.value = txt.value.substr(0, txt.value.length - 1)
+					result.value = result.value.substr(0, result.value.length - 1)
 					break
 				}
 			}
 			
-		default:	//10 tips
+		default:	//10条补全提示
 			tip.innerHTML = ""
 
 			if(code == "") return
@@ -54,7 +70,7 @@ function result()
 			var ch = grp[code.length < 4? `${code} ` : code]
 			if(ch != undefined) tip.innerHTML = ch
 
-			for(var cc = "a".charCodeAt(); cc < "z".charCodeAt(); cc++)
+			for(var cc = "a".charCodeAt(), Z = "z".charCodeAt(); cc < Z; cc++)
 			{
 				ch = grp[code + String.fromCharCode(cc) + (code.length == 3? "" : " ")]
 				if(ch != undefined && ct++ < 10) tip.innerHTML += `&nbsp;&nbsp;&nbsp;${String.fromCharCode(cc)}:${ch}`
@@ -62,14 +78,15 @@ function result()
 			}
 	}
 	
+	//达到4个字符或空格时把结果写入
 	if(code == "") return
 	var group = eval(code[0])
-	if(group[code] != undefined) txt.value += group[code]
+	if(group[code] != undefined) result.value += group[code]
 	if(code.length == 4 || code.endsWith(" ")) inp.value = ""
 }
 
 function focus_return()		//当结果框清空后就将焦点返回到输入框
 {
-	if(txt.value == "") inp.focus();
+	if(result.value == "") inp.focus();
 }
 </script>
